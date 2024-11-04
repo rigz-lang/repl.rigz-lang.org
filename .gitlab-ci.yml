@@ -4,7 +4,7 @@ pages:
   before_script:
     - cargo install trunk
   script:
-    - trunk build --release --public-url "${GITHUB_REPOSITORY#*/}"
+    - trunk build --release --public-url $CI_PAGES_URL
   artifacts:
     paths:
       - dist
