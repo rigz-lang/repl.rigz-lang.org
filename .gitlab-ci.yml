@@ -8,6 +8,7 @@ cache:
 pages:
   before_script:
     - cargo install trunk
+    - rustup target add wasm32-unknown-unknown
   script:
     - trunk build --release --public-url $CI_PAGES_URL
   artifacts:
