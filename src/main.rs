@@ -62,6 +62,10 @@ fn App() -> impl IntoView {
                     Test
                 </button>
             </div>
+            <footer class="w-full max-w-2xl mt-8 border-t border-gray-300 pt-4 flex justify-between text-gray-600">
+                <a href="//rigz-lang.org" class="hover:text-blue-500" rel="external">Rigz</a>
+                <a href="//docs.rigz-lang.org" class="hover:text-blue-500" rel="external">Docs</a>
+            </footer>
         </section>
     }
 }
