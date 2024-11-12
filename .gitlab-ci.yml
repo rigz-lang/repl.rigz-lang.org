@@ -4,15 +4,16 @@ image: rust:1.82.0
 cache:
   paths:
     - .cargo
+    - node_modules
 
 pages:
   before_script:
     - cargo install trunk
     - rustup target add wasm32-unknown-unknown
-    - sudo apt-get install -y curl
+    - apt-get install -y curl
     - curl -fsSL https://deb.nodesource.com/setup_23.x -o nodesource_setup.sh
-    - sudo -E bash nodesource_setup.sh
-    - sudo apt-get install -y nodejs
+    - bash nodesource_setup.sh
+    - apt-get install -y nodejs
     - npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
   script:
     - trunk build --release --public-url $CI_PAGES_URL
