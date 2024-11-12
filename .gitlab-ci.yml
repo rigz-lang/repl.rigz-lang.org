@@ -16,7 +16,7 @@ pages:
     - apt-get install -y nodejs
     - npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
   script:
-    - trunk build --release --public-url $CI_PAGES_URL
+    - trunk build --release --public-url https://repl.rigz-lang.org/
   artifacts:
     paths:
       - dist
