@@ -1480,6 +1480,8 @@ dependencies = [
 [[package]]
 name = "rigz_ast"
 version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46b4cb5731f210ec354915ada11923d61921780a6dbbf4c16f591d663487c5fa"
 dependencies = [
  "logos",
  "proc-macro2",
@@ -1490,6 +1492,8 @@ dependencies = [
 [[package]]
 name = "rigz_ast_derive"
 version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91f2f2d66e1524e91529608d960a5e99ad82738cc9938a82c20712c4ce57d695"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1500,6 +1504,8 @@ dependencies = [
 [[package]]
 name = "rigz_runtime"
 version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25f2d28cd6504f039fe0d5f5b6c7f08e591608eefa7ccb491afc8a0b053df733"
 dependencies = [
  "chrono",
  "getrandom",
@@ -1514,6 +1520,8 @@ dependencies = [
 [[package]]
 name = "rigz_vm"
 version = "0.36.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40cc0c171a875b0f779844820af2e20882758feb8ce949f77cb05719b1e6a218"
 dependencies = [
  "derive_more",
  "dyn-clone",
