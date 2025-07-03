@@ -1,21 +1,25 @@
 [package]
 name = "rigz-repl"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-leptos = { version = "0.6", features = ["csr", "nightly"] }
-leptos_meta = { version = "0.6", features = ["csr", "nightly"] }
-# rigz_runtime = {  version = "0.5.0", default-features = false, features = ["js"], path = "rigz/crates/runtime" }
-rigz_runtime = {  version = "0.5.0", default-features = false, features = ["js"] }
+icondata = {version = "0.6", features = ["lucide"], default-features = false }
+gloo-utils = "0.2.0"
+leptos = { version = "0.8.2", features = ["csr"] }
+leptos_meta = { version = "0.8" }
+leptos_router = "0.8"
+rigz_ast = {  version = "0.6", default-features = false, features = ["format"], path = "rigz/crates/ast" }
+# rigz_ast = {  version = "0.6", default-features = false, features = ["format"] }
+rigz_runtime = {  version = "0.6", default-features = false, features = ["js"], path = "rigz/crates/runtime" }
+# rigz_runtime = {  version = "0.5", default-features = false, features = ["js"] }
 console_log = { version = "1" }
 log = "0.4"
 console_error_panic_hook = "0.1"
-
-[dev-dependencies]
 wasm-bindgen = "0.2"
 wasm-bindgen-test = "0.3"
 web-sys = { version = "0.3", features = ["Document", "Window"] }
+js-sys = "0.3.77"
 
 [profile.release]
 opt-level = 'z'

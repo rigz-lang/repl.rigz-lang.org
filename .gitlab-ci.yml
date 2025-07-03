@@ -8,13 +8,14 @@ cache:
 
 pages:
   before_script:
+    - git clone https://gitlab.com/rigz_lang/rigz.git
     - cargo install trunk
     - rustup target add wasm32-unknown-unknown
     - apt-get install -y curl
     - curl -fsSL https://deb.nodesource.com/setup_23.x -o nodesource_setup.sh
     - bash nodesource_setup.sh
     - apt-get install -y nodejs
-    - npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+    - npm ci
   script:
     - trunk build --release --public-url https://repl.rigz-lang.org/
   artifacts:
