@@ -16,6 +16,7 @@ pages:
     - bash nodesource_setup.sh
     - apt-get install -y nodejs
     - npm ci
+    - npm install tailwindcss @tailwindcss/cli
   script:
     - trunk build --release --public-url https://repl.rigz-lang.org/
   artifacts:
