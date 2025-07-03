@@ -19,10 +19,13 @@ pages:
     - rustup target add wasm32-unknown-unknown
   script:
     - trunk build --release --public-url https://repl.rigz-lang.org/
+    - mv public .public
+    - mv dist public
   artifacts:
     paths:
-      - dist
-  publish: dist
+      - public
+  pages: true
+  publish: public
   rules:
     # This ensures that only pushes to the default branch will trigger
     # a pages deploy
