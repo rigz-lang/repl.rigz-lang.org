@@ -1,5 +1,5 @@
 # The Docker image that will be used to build your app
-image: rust:1.84.0
+image: rust:1.89.0
 
 cache:
   paths:
