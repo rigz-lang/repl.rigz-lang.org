@@ -106,7 +106,7 @@ fn Results(is_test: ReadSignal<bool>, results: ReadSignal<String>) -> impl IntoV
 fn Header(is_dark: ReadSignal<bool>, set_is_dark: WriteSignal<bool>) -> impl IntoView {
     view! {
         <header class="bg-white dark:bg-gray-800 shadow-sm">
-            <div class="max-w-7xl mx-auto md:px-6 py-4">
+            <div class="md:px-6 py-4">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                     <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Rigz REPL</h1>
                     <nav class="mx-auto md:ml-auto flex flex-wrap justify-center gap-6 text-gray-800 dark:text-gray-100 md:mr-6">
