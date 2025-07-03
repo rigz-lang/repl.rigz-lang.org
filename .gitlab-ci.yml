@@ -14,7 +14,7 @@ pages:
     - bash nodesource_setup.sh
     - apt-get install -y nodejs
     - npm ci
-    - cargo install trunk
+    - cargo binstall trunk
     - rustup target add wasm32-unknown-unknown
   script:
     - trunk build --release --public-url https://repl.rigz-lang.org/
