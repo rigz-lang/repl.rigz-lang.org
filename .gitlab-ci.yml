@@ -14,6 +14,7 @@ pages:
     - bash nodesource_setup.sh
     - apt-get install -y nodejs
     - npm ci
+    - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     - cargo binstall trunk
     - rustup target add wasm32-unknown-unknown
   script:
