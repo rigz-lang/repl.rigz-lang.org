@@ -19,6 +19,7 @@ pages:
     - rustup target add wasm32-unknown-unknown
     - npm install tailwindcss @tailwindcss/cli
   script:
+    - alias tailwind="npx @tailwindcss/cli"
     - trunk build --release --public-url https://repl.rigz-lang.org/
   artifacts:
     paths:
