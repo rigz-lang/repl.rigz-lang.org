@@ -208,7 +208,7 @@ fn Main() -> impl IntoView {
                         <div>
                             <div class="w-max flex gap-4 mb-2 items-center">
                                 <h3 class="text-lg font-semibold">Examples</h3>
-                                <select on:change=move |x| set_example_input(event_target_value(&x), set_contents) class="bg-white dark:bg-gray-800 dark:text-white">
+                                <select on:change=move |x| set_example_input(event_target_value(&x), set_contents) class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     <option value="test">Test</option>
                                     <option value="errors">Errors</option>
                                     <option value="processes">Processes</option>
