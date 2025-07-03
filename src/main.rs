@@ -159,70 +159,71 @@ fn Main() -> impl IntoView {
     let (is_test, set_is_test) = signal(false);
 
     view! {
-        <main class="flex-1 max-w-7xl w-full mx-auto md:px-4 py-6">
-                <div class="flex flex-wrap gap-3 justify-end mb-6 max-sm:px-4">
-                    <button
-                        class="flex-1 sm:flex-none px-6 py-1 bg-green-500 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
-                        on:click=move |_| {
-                            set_is_test.set(false);
-                            set_result.set(eval(contents.get())
-                                .map_err(|e| format!("Error: {e}"))
-                                .map(|v| v.to_string())
-                                .unwrap_or_else(|err| err)
-                            )
-                        }
-                    >
-                        Run
-                    </button>
-                    <button
-                        class="flex-1 sm:flex-none px-6 py-1 bg-yellow-500 text-gray-900 font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
-                        on:click=move |_| {
-                            set_is_test.set(true);
-                            set_result.set(test(contents.get())
-                                .map_err(|e| format!("Error: {e}"))
-                                .map(|v| v.to_string())
-                                .unwrap_or_else(|err| err)
-                            )
-                        }
-                    >
-                        Test
-                    </button>
-                    <button
-                        class="flex-1 sm:flex-none px-6 py-1 bg-gray-800 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors"
-                        on:click=move |_| {
-                            set_contents.set(rigz_ast::format(contents.get()))
-                        }
-                    >
-                        Format
-                    </button>
-                </div>
-                <div class="flex flex-col h-full space-y-6">
-                    <div class="flex-1 bg-white dark:bg-gray-800 md:rounded-lg shadow-sm p-4 flex flex-col min-h-[550px]">
-                        <div class="md:flex items-center justify-between mb-2 gap-2">
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Editor</h2>
-                            <div class="flex items-center space-x-2">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">All print/log output is shown in JavaScript console</p>
+        <main class="flex-1 w-full mx-auto md:px-4 py-6">
+            <div class="flex flex-wrap gap-3 justify-end mb-6 max-sm:px-4">
+                <button
+                    class="flex-1 sm:flex-none px-6 py-1 bg-green-500 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
+                    on:click=move |_| {
+                        set_is_test.set(false);
+                        set_result.set(eval(contents.get())
+                            .map_err(|e| format!("Error: {e}"))
+                            .map(|v| v.to_string())
+                            .unwrap_or_else(|err| err)
+                        )
+                    }
+                >
+                    Run
+                </button>
+                <button
+                    class="flex-1 sm:flex-none px-6 py-1 bg-yellow-500 text-gray-900 font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
+                    on:click=move |_| {
+                        set_is_test.set(true);
+                        set_result.set(test(contents.get())
+                            .map_err(|e| format!("Error: {e}"))
+                            .map(|v| v.to_string())
+                            .unwrap_or_else(|err| err)
+                        )
+                    }
+                >
+                    Test
+                </button>
+                <button
+                    class="flex-1 sm:flex-none px-6 py-1 bg-gray-800 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors"
+                    on:click=move |_| {
+                        set_contents.set(rigz_ast::format(contents.get()))
+                    }
+                >
+                    Format
+                </button>
+            </div>
+            <div class="flex h-full space-y-6">
+                <div class="flex-1 bg-white dark:bg-gray-800 md:rounded-lg shadow-sm p-4 flex flex-col min-h-[550px]">
+                    <div class="md:flex items-center justify-between mb-2 gap-2">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Editor</h2>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">All print/log output is shown in JavaScript console</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col lg:flex-row w-full my-2">
+                        <div>
+                            <div class="w-max flex gap-4 mb-2 items-center">
+                                <h3 class="text-lg font-semibold">Examples</h3>
+                                <select on:change=move |x| set_example_input(event_target_value(&x), set_contents)>
+                                    <option value="test">Test</option>
+                                    <option value="errors">Errors</option>
+                                    <option value="processes">Processes</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="w-max flex gap-4 mb-2 items-center">
-                            <h3 class="text-lg font-semibold">Examples</h3>
-                            <select on:change=move |x| set_example_input(event_target_value(&x), set_contents)>
-                                <option value="test">Test</option>
-                                <option value="errors">Errors</option>
-                                <option value="processes">Processes</option>
-                            </select>
-                        </div>
-                        <div class="flex flex-1 w-full my-2">
                             <CodeEditor contents={contents} set_contents={set_contents} />
                         </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 md:rounded-lg shadow-sm p-4">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Output</h2>
-                        <Results is_test={is_test} results={results}/>
+                        <div class="bg-white dark:bg-gray-800 md:rounded-lg shadow-sm px-4 max-md:p-4 flex-grow">
+                            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Result</h2>
+                            <Results is_test={is_test} results={results}/>
+                        </div>
                     </div>
                 </div>
-            </main>
+            </div>
+        </main>
     }
 }
 

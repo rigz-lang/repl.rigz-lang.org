@@ -33,7 +33,7 @@ extern "C" {
 }
 
 #[wasm_bindgen(
-    module = "/public/js/rigz.js"
+    module = "/node_modules/@rigz-lang/highlight.js/index.js"
 )]
 extern "C" {
     #[wasm_bindgen(catch, js_name = rigz)]
@@ -70,7 +70,7 @@ pub fn CodeEditor(
     set_contents: Option<WriteSignal<String>>
 ) -> impl IntoView {
     view! {
-        <div class="container min-h-[450px] w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 ">
+        <div class="container min-h-[450px] w-full lg:w-[75vw] border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 ">
             <Show when={move || set_contents.is_some()}>
                 <textarea
                     class="resize-none p-4"

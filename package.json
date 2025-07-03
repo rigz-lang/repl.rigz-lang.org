@@ -5,6 +5,7 @@
     "tailwindcss": "^4.1.10"
   },
   "dependencies": {
-    "@highlightjs/cdn-assets": "^11.11.1"
+    "@highlightjs/cdn-assets": "^11.11.1",
+    "@rigz-lang/highlight.js": "^0.6.0"
   }
 }
