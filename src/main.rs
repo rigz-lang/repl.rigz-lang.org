@@ -143,13 +143,13 @@ fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
         RunResult::Test(v) => {
             if v.success() {
                 view! {
-                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result: <strong class="text-green-500">ok</strong>. { format!("passed: {}, failed: {}, finished in {:?}",
+                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result:<strong class="text-green-500 ml-1">ok</strong>. { format!(" passed: {}, failed: {}, finished in {:?}",
                         v.passed, v.failed, v.duration
                     )}</pre>
                 }.into_any()
             } else {
                 view! {
-                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result: <strong class="text-red-500">failed</strong>. { format!("passed: {}, failed: {}, finished in {:?}",
+                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result:<strong class="text-red-500 ml-1">failed</strong>. { format!(" passed: {}, failed: {}, finished in {:?}",
                         v.passed, v.failed, v.duration
                     )}{ v.failure_messages.into_iter().map(|(name, reason)| format!("\t{name}: {reason}")).join("\n") }</pre>
                 }.into_any()
@@ -294,7 +294,6 @@ fn App() -> impl IntoView {
         />
         <Title text="Rigz REPL - Online Code Editor"/>
         <Meta charset="UTF-8"/>
-        <Meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <Meta name="description" content="Online REPL for the Rigz programming language"/>
 
         <div class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
