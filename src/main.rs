@@ -101,16 +101,6 @@ enum RunResult {
     Failure(RuntimeError)
 }
 
-impl RunResult {
-    fn error_value(&self) -> String {
-        let RunResult::Failure(r) = self else {
-            panic!("Non error value")
-        };
-
-        r.to_string()
-    }
-}
-
 impl Default for RunResult {
     fn default() -> Self {
         RunResult::Success(ObjectValue::default())
@@ -143,13 +133,13 @@ fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
         RunResult::Test(v) => {
             if v.success() {
                 view! {
-                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result:<strong class="text-green-500 ml-1">ok</strong>. { format!(" passed: {}, failed: {}, finished in {:?}",
+                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">{"test result: "}<strong class="text-green-500">ok</strong>.{ format!(" passed: {}, failed: {}, finished in {:?}",
                         v.passed, v.failed, v.duration
                     )}</pre>
                 }.into_any()
             } else {
                 view! {
-                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result:<strong class="text-red-500 ml-1">failed</strong>. { format!(" passed: {}, failed: {}, finished in {:?}",
+                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">{"test result: "}<strong class="text-red-500">failed</strong>.{ format!(" passed: {}, failed: {}, finished in {:?}",
                         v.passed, v.failed, v.duration
                     )}{ v.failure_messages.into_iter().map(|(name, reason)| format!("\t{name}: {reason}")).join("\n") }</pre>
                 }.into_any()
