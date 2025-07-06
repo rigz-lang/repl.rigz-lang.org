@@ -259,8 +259,8 @@ fn Main() -> impl IntoView {
                             </div>
                             <CodeEditor contents={contents} set_contents={set_contents} />
                         </div>
-                        <div class="bg-white dark:bg-gray-800 md:rounded-lg shadow-sm px-4 max-md:p-4 flex-grow">
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Result</h2>
+                        <div class="bg-white dark:bg-gray-800 md:rounded-lg px-4 max-md:p-4 flex-grow">
+                            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Result</h2>
                             <Results results={results}/>
                         </div>
                     </div>
