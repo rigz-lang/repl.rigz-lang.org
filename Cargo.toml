@@ -6,9 +6,11 @@ edition = "2024"
 [dependencies]
 icondata = {version = "0.6", features = ["lucide"], default-features = false }
 gloo-utils = "0.2.0"
+itertools = "0.14.0"
 leptos = { version = "0.8.2", features = ["csr"] }
 leptos_meta = { version = "0.8" }
 leptos_router = "0.8"
+rigz_core = {  version = "0.1", default-features = false, path = "rigz/crates/core" }
 rigz_ast = {  version = "0.6", default-features = false, features = ["format"], path = "rigz/crates/ast" }
 # rigz_ast = {  version = "0.6", default-features = false, features = ["format"] }
 rigz_runtime = {  version = "0.6", default-features = false, features = ["js"], path = "rigz/crates/runtime" }

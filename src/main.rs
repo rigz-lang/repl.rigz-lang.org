@@ -1,9 +1,11 @@
 mod code;
 
+use std::ops::Deref;
 use leptos_meta::*;
 use leptos::{mount::mount_to_body, prelude::*, svg};
-use rigz_runtime::eval;
+use rigz_runtime::{eval, RuntimeError};
 use icondata::{LuSun, LuMoon};
+use itertools::Itertools;
 
 static ERRORS_INPUT: &str = r#"fn foo = raise "foo failed"
 
@@ -90,15 +92,69 @@ pub fn Icon(
     }
 }
 
+use rigz_core::{ObjectValue, TestResults};
+
+#[derive(Clone)]
+enum RunResult {
+    Success(ObjectValue),
+    Test(TestResults),
+    Failure(RuntimeError)
+}
+
+impl RunResult {
+    fn error_value(&self) -> String {
+        let RunResult::Failure(r) = self else {
+            panic!("Non error value")
+        };
+
+        r.to_string()
+    }
+}
+
+impl Default for RunResult {
+    fn default() -> Self {
+        RunResult::Success(ObjectValue::default())
+    }
+}
+
 #[component]
-fn Results(is_test: ReadSignal<bool>, results: ReadSignal<String>) -> impl IntoView {
-    view! {
-        <textarea
-            class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
-            readonly
-        >
-            { move || results.get() }
-        </textarea>
+fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
+    move || match results.get() {
+        RunResult::Failure(v) => {
+            view! {
+                <textarea
+                    class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                    readonly
+                >
+                    { move || v.to_string() }
+                </textarea>
+            }.into_any()
+        }
+        RunResult::Success(v) => {
+            view! {
+                <textarea
+                    class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                    readonly
+                >
+                    { move || v.to_string() }
+                </textarea>
+            }.into_any()
+        }
+        RunResult::Test(v) => {
+            if v.success() {
+                view! {
+                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result: <strong class="text-green-500">ok</strong>. { format!("passed: {}, failed: {}, finished in {:?}",
+                        v.passed, v.failed, v.duration
+                    )}</pre>
+                }.into_any()
+            } else {
+                view! {
+                    <pre class="w-full h-32 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap">test result: <strong class="text-red-500">failed</strong>. { format!("passed: {}, failed: {}, finished in {:?}",
+                        v.passed, v.failed, v.duration
+                    )}{ v.failure_messages.into_iter().map(|(name, reason)| format!("\t{name}: {reason}")).join("\n") }</pre>
+                }.into_any()
+            }
+        }
     }
 }
 
@@ -155,8 +211,7 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
 #[component]
 fn Main() -> impl IntoView {
     let (contents, set_contents) = signal(TESTS_INPUT.trim().to_string());
-    let (results, set_result) = signal(String::new());
-    let (is_test, set_is_test) = signal(false);
+    let (results, set_result) = signal(RunResult::Success("".into()));
 
     view! {
         <main class="flex-1 w-full mx-auto md:px-4 py-6">
@@ -164,10 +219,9 @@ fn Main() -> impl IntoView {
                 <button
                     class="flex-1 sm:flex-none px-6 py-1 bg-green-500 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
                     on:click=move |_| {
-                        set_is_test.set(false);
                         set_result.set(eval(contents.get())
-                            .map_err(|e| format!("Error: {e}"))
-                            .map(|v| v.to_string())
+                            .map_err(|e| RunResult::Failure(e))
+                            .map(|v| RunResult::Success(v))
                             .unwrap_or_else(|err| err)
                         )
                     }
@@ -177,10 +231,9 @@ fn Main() -> impl IntoView {
                 <button
                     class="flex-1 sm:flex-none px-6 py-1 bg-yellow-500 text-gray-900 font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
                     on:click=move |_| {
-                        set_is_test.set(true);
                         set_result.set(test(contents.get())
-                            .map_err(|e| format!("Error: {e}"))
-                            .map(|v| v.to_string())
+                            .map_err(|e| RunResult::Failure(e))
+                            .map(|v| RunResult::Test(v))
                             .unwrap_or_else(|err| err)
                         )
                     }
@@ -218,7 +271,7 @@ fn Main() -> impl IntoView {
                         </div>
                         <div class="bg-white dark:bg-gray-800 md:rounded-lg shadow-sm px-4 max-md:p-4 flex-grow">
                             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Result</h2>
-                            <Results is_test={is_test} results={results}/>
+                            <Results results={results}/>
                         </div>
                     </div>
                 </div>
