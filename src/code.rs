@@ -2,10 +2,8 @@ use gloo_utils::format::JsValueSerdeExt;
 use js_sys::{
     Object,
     Reflect::{get, set},
-    Function
 };
 use leptos::{component, view, IntoView};
-use leptos::html::InnerHtml;
 use leptos::prelude::{ReadSignal, WriteSignal};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 use wasm_bindgen::closure::WasmClosureFnOnce;

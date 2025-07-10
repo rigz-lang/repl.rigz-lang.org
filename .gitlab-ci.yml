@@ -3,7 +3,7 @@ image: rust:1.88.0
 
 cache:
   paths:
-    - .cargo
+    - target
     - node_modules
 
 pages:

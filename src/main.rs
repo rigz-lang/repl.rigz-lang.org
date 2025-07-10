@@ -1,6 +1,5 @@
 mod code;
 
-use std::ops::Deref;
 use leptos_meta::*;
 use leptos::{mount::mount_to_body, prelude::*, svg};
 use rigz_runtime::{eval, RuntimeError};
@@ -224,8 +223,8 @@ fn Main() -> impl IntoView {
                                 class="flex px-6 py-1 gap-2 items-center bg-green-500 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
                                 on:click=move |_| {
                                     set_result.set(eval(contents.get())
-                                        .map_err(|e| RunResult::Failure(e))
-                                        .map(|v| RunResult::Success(v))
+                                        .map_err(RunResult::Failure)
+                                        .map(RunResult::Success)
                                         .unwrap_or_else(|err| err)
                                     )
                                 }
@@ -237,8 +236,8 @@ fn Main() -> impl IntoView {
                                 class="flex-1 px-6 py-1 bg-yellow-500 text-gray-900 font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
                                 on:click=move |_| {
                                     set_result.set(test(contents.get())
-                                        .map_err(|e| RunResult::Failure(e))
-                                        .map(|v| RunResult::Test(v))
+                                        .map_err(RunResult::Failure)
+                                        .map(RunResult::Test)
                                         .unwrap_or_else(|err| err)
                                     )
                                 }
