@@ -124,7 +124,7 @@ fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
         }
         RunResult::Success(v) => {
             view! {
-                <div 
+                <div
                     class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                 >
                     <pre aria_hidden={"true"} class="language-rigz font-mono">
@@ -212,7 +212,7 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
 #[component]
 fn Main() -> impl IntoView {
     let (contents, set_contents) = signal(TESTS_INPUT.trim().to_string());
-    let (results, set_result) = signal(RunResult::Success("".into()));
+    let (results, set_result) = signal(RunResult::default());
 
     view! {
         <main class="flex-1 w-full mx-auto md:px-4 py-6">
