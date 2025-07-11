@@ -56,7 +56,7 @@ foo
 "#;
 
 use rigz_runtime::runtime::test;
-use crate::code::{register_rigz, CodeEditor};
+use crate::code::{highlight, register_rigz, CodeEditor};
 
 /// The Icon component, modified from https://github.com/carloskiki/leptos-icons/blob/main/src/lib.rs
 #[component]
@@ -94,7 +94,7 @@ pub fn Icon(
     }
 }
 
-use rigz_core::{ObjectValue, TestResults};
+use rigz_core::{ObjectValue, PrimitiveValue, TestResults};
 
 #[derive(Clone)]
 enum RunResult {
@@ -124,12 +124,14 @@ fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
         }
         RunResult::Success(v) => {
             view! {
-                <textarea
+                <div 
                     class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
-                    readonly
                 >
-                    { move || v.to_string() }
-                </textarea>
+                    <pre aria_hidden={"true"} class="language-rigz font-mono">
+                        <code inner_html={move || highlight(if matches!(v, ObjectValue::Primitive(PrimitiveValue::String(_))) { format!("'{v}'")} else { v.to_string() }, "rigz".to_string()).into_render()} />
+                        <br />
+                    </pre>
+                </div>
             }.into_any()
         }
         RunResult::Test(v) => {
