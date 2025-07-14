@@ -28,6 +28,28 @@ end
 receive [a, b]
 "#;
 
+static LOOPS_INPUT: &str = r#"
+lists = [for a in [1, 2, 3, 4]: a * a]
+
+maps = {for k, v in {a = 1, b = 2, c = 3, d = 4}: v, k * v}
+
+mut a = 0
+loop
+    a += 1
+    break if a == 10
+end
+
+mut res = []
+
+for v in lists
+    next unless v % 2 == 0
+
+    res.push v
+end
+
+{ a, lists, maps, res }
+"#;
+
 static TESTS_INPUT: &str = r#"mut a = 1
 bar = do
     a += 1
@@ -131,7 +153,7 @@ fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
                 <div
                     class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                 >
-                    <pre aria_hidden={"true"} class="language-rigz font-mono">
+                    <pre aria_hidden={"true"} class="language-rigz font-mono text-wrap">
                         <code inner_html={move || highlight(if matches!(v, ObjectValue::Primitive(PrimitiveValue::String(_))) { format!("'{v}'")} else { v.to_string() }, "rigz".to_string()).into_render()} />
                         <br />
                     </pre>
@@ -142,7 +164,7 @@ fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
             let success = v.success();
             view! {
                 <pre
-                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap"
+                    class="text-wrap w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap"
                 >{"test result: "}<Show
                     when=move || success
                     fallback=|| view! { <strong class="text-red-500">failed</strong> }
@@ -208,6 +230,7 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
         "test" => TESTS_INPUT,
         "errors" => ERRORS_INPUT,
         "processes" => PROCESSES_INPUT,
+        "loops" => LOOPS_INPUT,
         _ => return
     };
     set_contents.set(input.to_string())
@@ -267,6 +290,7 @@ fn Main() -> impl IntoView {
                                 <select on:change=move |x| set_example_input(event_target_value(&x), set_contents) class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                     <option value="test">Test</option>
                                     <option value="errors">Errors</option>
+                                    <option value="loops">Loops</option>
                                     <option value="processes">Processes</option>
                                 </select>
                             </div>
