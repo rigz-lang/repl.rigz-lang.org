@@ -118,26 +118,22 @@ pub fn Icon(
 
 use rigz_core::{ObjectValue, PrimitiveValue, TestResults};
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 enum RunResult {
-    #[default]
-    None,
     Success(ObjectValue),
     Test(TestResults),
     Failure(RuntimeError)
 }
 
+impl Default for RunResult {
+    fn default() -> Self {
+        Self::Success(ObjectValue::default())
+    }
+}
+
 #[component]
 fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
     move || match results.get() {
-        RunResult::None => {
-            view! {
-                <textarea
-                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
-                    readonly 
-                />
-            }.into_any()
-        }
         RunResult::Failure(v) => {
             view! {
                 <textarea
