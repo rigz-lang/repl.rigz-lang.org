@@ -6,76 +6,15 @@ use rigz_runtime::{eval, RuntimeError};
 use icondata::{LuSun, LuMoon, SiGitlab, LuPlay};
 use itertools::Itertools;
 
-static ERRORS_INPUT: &str = r#"fn foo = raise "foo failed"
+static ERRORS_INPUT: &str = include_str!("examples/errors.rg");
 
-bar = foo catch = "hello"
+static PROCESSES_INPUT: &str = include_str!("examples/processes.rg");
 
-baz = foo catch
-    1 + 2
-end
+static LOOPS_INPUT: &str = include_str!("examples/loops.rg");
 
-bar + baz
-"#;
+static TESTS_INPUT: &str = include_str!("examples/tests.rg");
 
-static PROCESSES_INPUT: &str = r#"a = spawn do
-    "first"
-end
-
-b = spawn do
-    "second"
-end
-
-receive [a, b]
-"#;
-
-static LOOPS_INPUT: &str = r#"
-lists = [for a in [1, 2, 3, 4]: a * a]
-
-maps = {for k, v in {a = 1, b = 2, c = 3, d = 4}: v, k * v}
-
-mut a = 0
-loop
-    a += 1
-    break if a == 10
-end
-
-mut res = []
-
-for v in lists
-    next unless v % 2 == 0
-
-    res.push v
-end
-
-{ a, lists, maps, res }
-"#;
-
-static TESTS_INPUT: &str = r#"mut a = 1
-bar = do
-    a += 1
-    21 * a
-end
-
-fn foo = bar
-
-@test
-fn test_foo
-  mut a = 1 # variables in main scope are not available for tests, this will be fixed in a later version
-  bar = do
-    a += 1
-    21 * a
-  end
-
-  # assert_eq returns error if false
-  # try is required because there are no panics
-  try assert_eq foo, 42
-  # scopes are only processed once
-  # try not required because last line is return value
-  assert_eq foo, 42
-end
-
-foo
-"#;
+static OBJECTS_INPUT: &str = include_str!("examples/objects.rg");
 
 use rigz_runtime::runtime::test;
 use crate::code::{highlight, register_rigz, CodeEditor};
@@ -227,6 +166,7 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
         "errors" => ERRORS_INPUT,
         "processes" => PROCESSES_INPUT,
         "loops" => LOOPS_INPUT,
+        "objects" => OBJECTS_INPUT,
         _ => return
     };
     set_contents.set(input.to_string())
@@ -288,16 +228,39 @@ fn Main() -> impl IntoView {
                                     <option value="errors">Errors</option>
                                     <option value="loops">Loops</option>
                                     <option value="processes">Processes</option>
+                                    <option value="objects">Objects / Imports</option>
                                 </select>
                             </div>
                             <CodeEditor contents={contents} set_contents={set_contents} />
                         </div>
-                        <div class="md:rounded-lg flex-grow">
-                            <div class="flex items-center justify-between mb-2">
-                                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Result</h2>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">All print/log output is shown in JavaScript console</p>
+                        <div class="grid gap-y-2 w-full">
+                            <div class="md:rounded-lg flex-grow">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Result</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">All print/log output is shown in JavaScript console</p>
+                                </div>
+                                <Results results={results}/>
                             </div>
-                            <Results results={results}/>
+                            <div class="md:rounded-lg flex-grow">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Output</h2>
+                                </div>
+                                <textarea
+                                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                                    readonly
+                                >
+                                </textarea>
+                            </div>
+                            <div class="md:rounded-lg flex-grow">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Logs</h2>
+                                </div>
+                                <textarea
+                                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                                    readonly
+                                >
+                                </textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
