@@ -1,10 +1,12 @@
 mod code;
+mod components;
+pub(crate) mod utils;
 
+use std::sync::Arc;
 use leptos_meta::*;
-use leptos::{mount::mount_to_body, prelude::*, svg};
-use rigz_runtime::{eval, RuntimeError};
-use icondata::{LuSun, LuMoon, SiGitlab, LuPlay};
-use itertools::Itertools;
+use leptos::{mount::mount_to_body, prelude::*};
+use rigz_runtime::{eval, CAPTURE};
+use icondata::LuPlay;
 
 static ERRORS_INPUT: &str = include_str!("examples/errors.rg");
 
@@ -17,148 +19,11 @@ static TESTS_INPUT: &str = include_str!("examples/tests.rg");
 static OBJECTS_INPUT: &str = include_str!("examples/objects.rg");
 
 use rigz_runtime::runtime::test;
-use crate::code::{highlight, register_rigz, CodeEditor};
+use crate::code::{register_rigz, CodeEditor};
 
-/// The Icon component, modified from https://github.com/carloskiki/leptos-icons/blob/main/src/lib.rs
-#[component]
-pub fn Icon(
-    /// The icon to render.
-    #[prop(into)]
-    icon: Signal<icondata::Icon>,
-    #[prop(into, optional)] style: MaybeProp<String>,
-    #[prop(into, optional)] width: MaybeProp<String>,
-    #[prop(into, optional)] height: MaybeProp<String>,
-    #[prop(into, optional)] class: MaybeProp<String>,
-) -> impl IntoView {
-    move || {
-        let icon = icon.get();
-        svg::svg()
-            .style(match (style.get(), icon.style) {
-                (Some(a), Some(b)) => Some(format!("{b} {a}")),
-                (Some(a), None) => Some(a),
-                (None, Some(b)) => Some(b.to_string()),
-                _ => None,
-            })
-            .attr("x", icon.x)
-            .attr("y", icon.y)
-            .attr("width", width.get().unwrap_or_else(|| "1em".to_string()))
-            .attr("height", height.get().unwrap_or_else(|| "1em".to_string()))
-            .attr("viewBox", icon.view_box)
-            .attr("stroke-linecap", icon.stroke_linecap)
-            .attr("stroke-linejoin", icon.stroke_linejoin)
-            .attr("stroke-width", icon.stroke_width)
-            .attr("stroke", icon.stroke)
-            .attr("fill", icon.fill.unwrap_or("currentColor"))
-            .attr("role", "graphics-symbol")
-            .class(class.get().unwrap_or_default())
-            .inner_html(icon.data)
-    }
-}
-
-use rigz_core::{ObjectValue, PrimitiveValue, TestResults};
-
-#[derive(Clone)]
-enum RunResult {
-    Success(ObjectValue),
-    Test(TestResults),
-    Failure(RuntimeError)
-}
-
-impl Default for RunResult {
-    fn default() -> Self {
-        Self::Success(ObjectValue::default())
-    }
-}
-
-#[component]
-fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
-    move || match results.get() {
-        RunResult::Failure(v) => {
-            view! {
-                <textarea
-                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
-                    readonly
-                >
-                    { move || v.to_string() }
-                </textarea>
-            }.into_any()
-        }
-        RunResult::Success(v) => {
-            view! {
-                <div
-                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
-                >
-                    <pre aria_hidden={"true"} class="language-rigz font-mono text-wrap">
-                        <code inner_html={move || highlight(if matches!(v, ObjectValue::Primitive(PrimitiveValue::String(_))) { format!("'{v}'")} else { v.to_string() }, "rigz".to_string()).into_render()} />
-                        <br />
-                    </pre>
-                </div>
-            }.into_any()
-        }
-        RunResult::Test(v) => {
-            let success = v.success();
-            view! {
-                <pre
-                    class="text-wrap w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap"
-                >{"test result: "}<Show
-                    when=move || success
-                    fallback=|| view! { <strong class="text-red-500">failed</strong> }
-                ><strong class="text-green-500">ok</strong></Show>.{
-                    format!(" passed: {}, failed: {}, finished in {:?}\n{}",
-                        v.passed, v.failed, v.duration,
-                        v.failure_messages.into_iter()
-                            .map(|(name, reason)| format!("\t{name}: {reason}"))
-                            .join("\n"))
-                }</pre>
-            }.into_any()
-        }
-    }
-}
-
-#[component]
-fn Header(is_dark: ReadSignal<bool>, set_is_dark: WriteSignal<bool>) -> impl IntoView {
-    view! {
-        <header class="bg-white dark:bg-gray-800 shadow-sm md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Rigz REPL</h1>
-            <nav class="mx-auto md:ml-auto flex flex-wrap justify-center items-center gap-6 text-gray-800 dark:text-gray-100 md:mr-6">
-                <a href="https://rigz-lang.org" class="hover:text-blue-500 transition-colors" rel="external">Rigz</a>
-                <a href="https://docs.rigz-lang.org" class="hover:text-blue-500 transition-colors" rel="external">Docs</a>
-                <Gitlab />
-            </nav>
-            <button
-                class="px-3 py-1 text-sm font-semibold outline-none focus:outline-none dark:text-white hover:opacity-50"
-                on:click=move |_| set_is_dark.set(!is_dark.get())
-                aria-label=move || if is_dark.get() { "Switch to Light Mode" } else { "Switch to Dark Mode" }
-            >
-                { move || if is_dark.get() { view! { <Icon icon=LuSun height="1.5rem" width="1.5rem"/> } } else { view! { <Icon icon=LuMoon height="1.5rem" width="1.5rem"/> }  }}
-            </button>
-        </header>
-    }
-}
-
-#[component]
-fn Gitlab() -> impl IntoView {
-    view! {
-        <a href="https://gitlab.com/rigz_lang/repl.rigz-lang.org" class="hover:text-[#FC6D26] transition-colors" rel="external">
-            <Icon icon=SiGitlab height="1.5rem" width="1.5rem" />
-        </a>
-    }
-}
-
-#[component]
-fn Footer() -> impl IntoView {
-    view! {
-        <footer class="bg-white dark:bg-gray-800 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
-                    <a href="https://rigz-lang.org" class="hover:text-blue-500 transition-colors" rel="external">Rigz</a>
-                    <a href="https://docs.rigz-lang.org" class="hover:text-blue-500 transition-colors" rel="external">Documentation</a>
-                    <Gitlab />
-                </div>
-            </div>
-        </footer>
-    }
-}
+use crate::components::{Footer, Header, Icon, LogLevelSelector, Results, RunResult, TextAccordion};
+use crate::utils::log_capture;
+use crate::utils::log_capture::{set_write_signal, CaptureSignal};
 
 fn set_example_input(value: String, set_contents: WriteSignal<String>) {
     let input = match value.as_str() {
@@ -176,6 +41,15 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
 fn Main() -> impl IntoView {
     let (contents, set_contents) = signal(TESTS_INPUT.trim().to_string());
     let (results, set_result) = signal(RunResult::default());
+    let (logs, set_logs) = signal::<Vec<String>>(vec![]);
+    let (print, set_print) = signal(String::new());
+    let (err, set_err) = signal(String::new());
+
+    let std_out: Arc<CaptureSignal> = Arc::new(set_print.into());
+    let std_err: Arc<CaptureSignal> = Arc::new(set_err.into());
+    let _ = CAPTURE.out.write().unwrap().insert(std_out);
+    let _ = CAPTURE.err.write().unwrap().insert(std_err);
+    set_write_signal(set_logs);
 
     view! {
         <main class="flex-1 w-full mx-auto md:px-4 py-6">
@@ -187,6 +61,9 @@ fn Main() -> impl IntoView {
                             <button
                                 class="flex px-6 py-1 gap-2 items-center bg-green-500 text-white font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
                                 on:click=move |_| {
+                                    set_err.set(String::new());
+                                    set_print.set(String::new());
+                                    set_logs.set(vec![]);
                                     set_result.set(eval(contents.get())
                                         .map_err(RunResult::Failure)
                                         .map(RunResult::Success)
@@ -200,6 +77,9 @@ fn Main() -> impl IntoView {
                             <button
                                 class="flex-1 px-6 py-1 bg-yellow-500 text-gray-900 font-semibold rounded-md shadow hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
                                 on:click=move |_| {
+                                    set_err.set(String::new());
+                                    set_print.set(String::new());
+                                    set_logs.set(vec![]);
                                     set_result.set(test(contents.get())
                                         .map_err(RunResult::Failure)
                                         .map(RunResult::Test)
@@ -234,33 +114,41 @@ fn Main() -> impl IntoView {
                             <CodeEditor contents={contents} set_contents={set_contents} />
                         </div>
                         <div class="grid gap-y-2 w-full">
-                            <div class="md:rounded-lg flex-grow">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Result</h2>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">All print/log output is shown in JavaScript console</p>
-                                </div>
+                            <TextAccordion title="Result">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">All print/log output is shown in JavaScript console</p>
                                 <Results results={results}/>
-                            </div>
-                            <div class="md:rounded-lg flex-grow">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Output</h2>
-                                </div>
+                            </TextAccordion>
+                            <TextAccordion title="Output">
                                 <textarea
                                     class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                                     readonly
                                 >
+                                    {
+                                        print.get()
+                                    }
                                 </textarea>
-                            </div>
-                            <div class="md:rounded-lg flex-grow">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Logs</h2>
-                                </div>
+                            </TextAccordion>
+                            <TextAccordion title="Errors">
                                 <textarea
                                     class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                                     readonly
                                 >
+                                    {
+                                        err.get()
+                                    }
                                 </textarea>
-                            </div>
+                            </TextAccordion>
+                            <TextAccordion title="Logs">
+                                <LogLevelSelector />
+                                <textarea
+                                    class="w-full h-48 overflow-y-auto p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                                    readonly
+                                >
+                                    {
+                                        logs.get().join("\n")
+                                    }
+                                </textarea>
+                            </TextAccordion>
                         </div>
                     </div>
                 </div>
@@ -303,9 +191,8 @@ fn main() {
     unsafe {
         __wasm_call_ctors();
     }
-
+    log_capture::init(log::Level::Info);
     console_error_panic_hook::set_once();
-    let _ = console_log::init_with_level(log::Level::Info);
     register_rigz();
     mount_to_body(App)
 }
