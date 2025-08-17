@@ -24,7 +24,7 @@ pub fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
         RunResult::Failure(v) => {
             view! {
                 <textarea
-                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                    class="w-full h-24 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                     readonly
                 >
                     { move || v.to_string() }
@@ -34,7 +34,7 @@ pub fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
         RunResult::Success(v) => {
             view! {
                 <div
-                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                    class="w-full h-24 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                 >
                     <pre aria_hidden={"true"} class="language-rigz font-mono text-wrap">
                         <code inner_html={move || highlight(v.dev_print(), "rigz".to_string()).into_render()} />
@@ -47,7 +47,7 @@ pub fn Results(results: ReadSignal<RunResult>) -> impl IntoView {
             let success = v.success();
             view! {
                 <pre
-                    class="text-wrap w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap"
+                    class="text-wrap w-full h-24 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap"
                 >{"test result: "}<Show
                     when=move || success
                     fallback=|| view! { <strong class="text-red-500">failed</strong> }

@@ -17,6 +17,7 @@ static LOOPS_INPUT: &str = include_str!("examples/loops.rg");
 static TESTS_INPUT: &str = include_str!("examples/tests.rg");
 
 static OBJECTS_INPUT: &str = include_str!("examples/objects.rg");
+static BUILTIN_INPUT: &str = include_str!("examples/builtin.rg");
 
 use rigz_runtime::runtime::test;
 use crate::code::{register_rigz, CodeEditor};
@@ -32,6 +33,7 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
         "processes" => PROCESSES_INPUT,
         "loops" => LOOPS_INPUT,
         "objects" => OBJECTS_INPUT,
+        "builtin" => BUILTIN_INPUT,
         _ => return
     };
     set_contents.set(input.to_string())
@@ -39,7 +41,7 @@ fn set_example_input(value: String, set_contents: WriteSignal<String>) {
 
 #[component]
 fn Main() -> impl IntoView {
-    let (contents, set_contents) = signal(TESTS_INPUT.trim().to_string());
+    let (contents, set_contents) = signal(BUILTIN_INPUT.trim().to_string());
     let (results, set_result) = signal(RunResult::default());
     let (logs, set_logs) = signal::<Vec<String>>(vec![]);
     let (print, set_print) = signal(String::new());
@@ -104,6 +106,7 @@ fn Main() -> impl IntoView {
                             <div class="w-max flex gap-4 mb-2 items-center">
                                 <h3 class="text-lg font-semibold">Examples</h3>
                                 <select on:change=move |x| set_example_input(event_target_value(&x), set_contents) class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="builtin">Core Features</option>
                                     <option value="test">Test</option>
                                     <option value="errors">Errors</option>
                                     <option value="loops">Loops</option>
@@ -115,12 +118,12 @@ fn Main() -> impl IntoView {
                         </div>
                         <div class="grid gap-y-2 w-full">
                             <TextAccordion title="Result">
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">All print/log output is shown in JavaScript console</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">All print/log output is shown in JavaScript console</p>
                                 <Results results={results}/>
                             </TextAccordion>
                             <TextAccordion title="Output">
                                 <textarea
-                                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                                    class="w-full h-24 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                                     readonly
                                 >
                                     {
@@ -130,7 +133,7 @@ fn Main() -> impl IntoView {
                             </TextAccordion>
                             <TextAccordion title="Errors">
                                 <textarea
-                                    class="w-full h-32 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
+                                    class="w-full h-24 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-gray-100 font-mono text-sm whitespace-pre-wrap resize-none"
                                     readonly
                                 >
                                     {
