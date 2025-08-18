@@ -4,13 +4,12 @@ mut b = [:baz] # use mut for mutable variables
 
 b += :baz # most types support common operators: +, -, *, /, %, ^, |, ||, &, &&, <, <=, <<, >, >=. >>
 
+# puts, print, eprint, println, eprintln are available
 puts a, b # puts displays each variable passed in on a newline
 println 'println: ', a, b # print concatenates values together, with no commas
 
 # ?: can be used to default to a value if it is none or an error, || checks if it's truthy
-fmt = format("{} {}", [] || a, none ?: b)
-
-eprintln 'Error: ', fmt # print, eprint, println, eprintln are available
+eprintln 'Error: ', format("{} {}", [] || a, none ?: b)
 
 printf "printf: {} {}", a, b # printf adds a newline after a template
 
